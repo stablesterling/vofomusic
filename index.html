@@ -882,9 +882,7 @@
 // ============================================
 // BACKEND CONFIGURATION
 // ============================================
-const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:8000/api'
-    : window.location.origin + '/api';
+const BACKEND_URL = window.location.origin + '/api';
 
 let player = null;
 let currentUser = null;
@@ -1297,7 +1295,7 @@ function renderTracks(tracks, target) {
     // Store tracks for playlist
     window._currentTrackList = tracks;
     
-    // Check favorites if user is logged in
+    // Only check favorites if user is logged in AND has a valid token
     if (currentUser && token) {
         tracks.forEach(s => checkFavorite(s.id));
     }
@@ -1372,12 +1370,30 @@ async function toggleFavorite(songId) {
 }
 
 async function checkFavorite(songId) {
-    if (!currentUser || !token) return;
+    // Only check if user is logged in and has a token
+    if (!currentUser || !token) {
+        return;
+    }
     
     try {
         const response = await fetch(`${BACKEND_URL}/favorites/check/${songId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        
+        if (!response.ok) {
+            // If 401 Unauthorized, clear token and reload
+            if (response.status === 401) {
+                localStorage.removeItem('vofo_user');
+                localStorage.removeItem('vofo_token');
+                token = null;
+                currentUser = null;
+                showToast('Session expired. Please login again.', 'error');
+                location.reload();
+                return;
+            }
+            return;
+        }
+        
         const data = await response.json();
         const btn = document.getElementById(`fav_${songId}`);
         if (btn && data.isFavorited) {
@@ -1451,6 +1467,18 @@ async function checkIfLiked(id) {
         const response = await fetch(`${BACKEND_URL}/favorites/check/${id}`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('vofo_user');
+                localStorage.removeItem('vofo_token');
+                token = null;
+                currentUser = null;
+                return;
+            }
+            return;
+        }
+        
         const data = await response.json();
         document.getElementById('likeBtn').classList.toggle('liked', data.isFavorited || false);
     } catch (error) {
