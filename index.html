@@ -22,6 +22,7 @@
             font-family: var(--sans); 
             min-height: 100vh;
             overflow-x: hidden;
+            padding-bottom: 80px;
         }
 
         #bg-blur {
@@ -425,7 +426,7 @@
             position: fixed; 
             bottom: 0; 
             width: 100%; 
-            background: rgba(0,0,0,.85); 
+            background: rgba(0,0,0,.95); 
             backdrop-filter: blur(20px); 
             padding: 15px 20px; 
             display: flex; 
@@ -445,7 +446,7 @@
             flex-direction: column; 
             justify-content: center; 
             gap: 40px;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.98);
             padding: 60px 30px; 
         }
         
@@ -468,6 +469,7 @@
         .player-info { 
             flex: 1; 
             min-width: 0; 
+            cursor: pointer;
         }
         .player-info div:first-child { 
             font-weight: 600; 
@@ -690,7 +692,7 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(-100%);
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             backdrop-filter: blur(20px);
             padding: 12px 24px;
             border-radius: 8px;
